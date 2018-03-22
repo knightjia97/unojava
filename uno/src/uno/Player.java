@@ -11,11 +11,19 @@ public class Player {
 		this.handcard = c;
 	}
 	
+	public Player(String s){
+		this.name=s;
+	}
+	
 	public Card removeCard(int i){
 		return this.handcard.remove(i);	
 	}
 	
 	public void addCard(Card c){
 		this.handcard.add(c);
+	}
+	
+	public String getName(){
+		return name + "\n";
 	}
 }
