@@ -6,39 +6,53 @@ import java.util.Collections;
 public class Player {
 	private String name;
 	private ArrayList<Card> handcard;
-	
-	public Player(String s, ArrayList<Card> c){
+	private int handcount; // counting number of cards in hand
+
+	public Player(String s, ArrayList<Card> c) {
 		this.name = s;
 		this.setHandcard(c);
 	}
-	
-	public Player(String s){
-		this.name=s;
+
+	public Player(String s) {
+		this.name = s;
 		this.setHandcard(new ArrayList<Card>());
 	}
-	
-	public Card removeCard(int i){
-		return this.getHandcard().remove(i);	
+
+	public Card removeCard(int i) {
+		return this.getHandcard().remove(i);
 	}
-	
-	public void addCard(Card c){
+
+	public void addCard(Card c) {
 		this.getHandcard().add(c);
 	}
-	
-	public String getName(){
+
+	public String getName() {
 		return name + "\n";
-	}	
-	
+	}
+
 	public String toString() {
 		return "Name: '" + this.name + "', cards: '" + this.getHandcard() + "\n";
 	}
 
-	//testing
+	// testing
 	public ArrayList<Card> getHandcard() {
 		return handcard;
 	}
 
 	public void setHandcard(ArrayList<Card> handcard) {
 		this.handcard = handcard;
+	}
+
+	public boolean drawCard(int i, Card o) {
+		if (i > 0 && i < handcard.size()) {
+			if (handcard.get(i - 1).isValidCard(o))
+				return true;
+			else {
+				System.out.println("Choose a valid card");
+				return false;
+			}
+		} else
+			System.out.println("Enter valid hand card");
+		return false;
 	}
 }
