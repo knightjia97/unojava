@@ -7,4 +7,10 @@ public class Reverse extends Card {
 		//test hehe 22
 	}
 
+	public void action(){
+		if (Game.flagrev == true)
+			Game.flagrev = false;
+		else
+			Game.flagrev = true;
+	}
 }

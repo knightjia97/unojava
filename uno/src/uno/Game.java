@@ -8,21 +8,45 @@ import java.util.Scanner;
 public class Game {
 
 	public static int turncount = 0;// global turn counter
-
+	public static boolean flagrev = false;
+	public static boolean flagskip = false;
+	public static boolean flagdrawtwo = false;
+	public static boolean flagwilddrawfour = false;
+	
 	public static void main(String[] args) {
+
+		Scanner sc = new Scanner(System.in);
+		int id = 1;
+		int playcard;
+		int playernum = 0;
+		int challengeChoice=0;
+		String rubbish;
+		boolean validPlayernum = false;
+
+		System.out.println("Welcome to JAVA UNO GAME!!!");
+
+		// check valid player number
+		while (validPlayernum == false) {
+			System.out.println("Enter the number of players(Recommended 2-4 players): ");
+			playernum = sc.nextInt();
+			rubbish = sc.nextLine();
+			if (playernum >= 2 && playernum <= 4)
+				validPlayernum = true;
+		}
+
+		// prompt players' name
+		ArrayList<Player> players = new ArrayList<Player>();
+		for (int i = 0; i < playernum; i++) {
+			System.out.println("Enter player" + (i + 1) + " name: ");
+			players.add(new Player(sc.nextLine()));
+		}
+
 		ArrayList<Card> deck = new ArrayList<Card>();
 		ArrayList<Card> pile = new ArrayList<Card>(); // empty pile
 		String[] symbol = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 		String[] color = { "red", "yellow", "green", "blue" };
 
-		int id = 1;
-		// for (int i = 0; i <= 9; i++) {
-		// deck.add(new Card("red", symbol[i],));
-		// deck.add(new Card("blue", symbol[i]));
-		// deck.add(new Card("green", symbol[i]));
-		// deck.add(new Card("yellow", symbol[i]));
-		// }
-
+		// initializing card deck with id
 		for (int i = 0; i <= 3; i++) {
 			deck.add(new Card(color[i], "0", id));
 			id++;
@@ -61,66 +85,241 @@ public class Game {
 		id++;
 		deck.add(new WildDrawFour("", "WildDrawFour", id));
 
-		// Collections.shuffle(deck);
+		Collections.shuffle(deck);
 
-		ArrayList<Player> players = new ArrayList<Player>();
-		players.add(new Player("KEE1"));
-		players.add(new Player("LEE2"));
-		players.add(new Player("PEE3"));
-		players.add(new Player("ooo4"));
-
-		// Card tmp = deck.remove(0);
-		// System.out.println("tmp content:"+tmp); //testing remove ( add card
-		// into player hand)
-		players.get(0).addCard(deck.remove(0));
-		players.get(0).addCard(deck.remove(0));
-		players.get(0).addCard(deck.remove(0));
-		players.get(0).addCard(deck.remove(0));
-		players.get(0).addCard(deck.remove(0));
-		players.get(0).addCard(deck.remove(0));
-		players.get(0).addCard(deck.remove(0));
-		players.get(0).addCard(deck.remove(0));
-		System.out.println("before playing card into pile\n" + players.toString());
+		// distribute cards to players
+		for (int i = 0; i < playernum; i++) {
+			players.get(i).addCard(deck.remove(0));
+			players.get(i).addCard(deck.remove(0));
+			players.get(i).addCard(deck.remove(0));
+			players.get(i).addCard(deck.remove(0));
+			players.get(i).addCard(deck.remove(0));
+		}
 
 		pile.add(deck.remove(0));
-		System.out.println("TOP CARD IN PILE:" + pile.toString());
 
-		Scanner sc = new Scanner(System.in);
-		int drawcard;
-		String rubbish;
+		// ------------------AFTER GAME INITIALIZATION------------------------
+
+		boolean checkWinningCondition = false;
 		boolean validcardFlag = false;
-
-		while (validcardFlag == false) {    //check valid card , if true, proceed || if false, loop until valid
-			System.out.println("Enter your card to draw");
-			drawcard = sc.nextInt();
-
-			if (players.get(0).drawCard(drawcard, pile.get(pile.size() - 1))) {
-				pile.add(players.get(0).removeCard(drawcard - 1));
-				validcardFlag = true;
-			} else
-				rubbish = sc.nextLine();
-		}
 		
-		// //top card of the pile
-		System.out.println("Pile contents:" + pile.toString());
+		int i = 0;
+		int choice = 0;
 
-		// players.get(0).addCard(deck.remove(34));
+		// for (int i = 0; i < playernum; i++) {
+		while (checkWinningCondition == false) {
+			validcardFlag = false;
 
-		// Collections.sort(players.get(0).getHandcard());
+			//game loop
+			if (flagrev == false) {
+				if (i >= playernum)
+					i = i - playernum;
+			} else if (flagrev == true) {
+				if (i < 0)
+					i = i + playernum;
+			}
+			
 
-		// class CustomComparator implements Comparator<Card> {
-		// @Override
-		// public int compare(Card o1, Card o2) {
-		// return o1.getId().compareTo(o2.getId());
-		// }
-		// }
-		// Collections.sort(Database.arrayList, new CustomComparator());
-		// Collections.sort(Database.arrayList,(o1, o2) ->
-		// o1.getId().compareTo(o2.getId()));
+			System.out.println("\n\nTOP CARD IN PILE:" + pile.get(pile.size() - 1).toString());
+			System.out.println("Player" + (i + 1) + " turn: ");
+			Collections.sort(players.get(i).getHandcard());
+			System.out.println("Your hand card:\n" + players.get(i).toString()); // display
+																					// player
+																					// card
+			while (choice != 1 && choice != 2) {
+				System.out.println("Choose your action: 1)Play a card ");
+				System.out.println("                    2)Draw a card ");
+				choice = sc.nextInt();
+				rubbish = sc.nextLine();
+			}
 
-		System.out.println("after playing card into pile\n" + players.toString());
-		System.out.println("Pile contents after playing:" + pile.toString());
+			if (choice == 1) {
+				// ---------------Choose card from deck--------------------
+				while (validcardFlag == false) { // check valid card , if true, proceed || if false, loop until valid
+					System.out.println("Enter your card to draw");
+					playcard = sc.nextInt();
+					rubbish = sc.nextLine();
 
+					// playing card out of hand
+					if (players.get(i).playCard(playcard, pile.get(pile.size() - 1))) { //check (color or symbol) and valid card choice
+						pile.add(players.get(i).removeCard(playcard - 1));
+						validcardFlag = true;
+						
+						//------still in testing------
+						switch (pile.get(pile.size()-1).getSymbol()){
+						case "Reverse":
+							pile.get(pile.size()-1).action();
+							break;
+						case "Skip":
+							pile.get(pile.size()-1).action();
+							break;
+						case "DrawTwo":
+							pile.get(pile.size()-1).action();
+							break;
+						case "Wild":
+							pile.get(pile.size()-1).action();
+							break;
+						case "WildDrawFour":
+							pile.get(pile.size()-1).action();
+							
+						}						
+						//------still in testing------
+						
+						if (players.get(i).getCount() == 0)
+							checkWinningCondition = true;
+
+						//normal game direction
+						if (flagrev == false) {
+							//skip function
+							if(flagskip==true){
+								i++;
+								flagskip = false;
+							}
+							//draw two function
+							if(flagdrawtwo == true){
+								i++;
+								if(i >= playernum)
+									i = i - playernum;
+								players.get(i).addCard(deck.remove(0));
+								players.get(i).addCard(deck.remove(0));
+								System.out.println(players.get(i).toString());
+								flagdrawtwo = false;
+							}
+							//wild draw four
+							if(flagwilddrawfour == true){
+								i++;
+								if(i >= playernum)
+									i = i - playernum;
+								
+								System.out.println("1)Challenge or 2)no:");
+								challengeChoice = sc.nextInt();
+								rubbish = sc.nextLine();
+								
+								if(challengeChoice==1){
+									i--;
+									if(i < 0)
+										i = i + playernum;
+									if(players.get(i).challengeCheck(pile.get(pile.size()-2))){
+										players.get(i).addCard(deck.remove(0));
+										players.get(i).addCard(deck.remove(0));
+										players.get(i).addCard(deck.remove(0));
+										players.get(i).addCard(deck.remove(0));	
+									}
+									
+									else {
+										i++;
+										if(i >= playernum)
+											i = i - playernum;
+										players.get(i).addCard(deck.remove(0));
+										players.get(i).addCard(deck.remove(0));
+										players.get(i).addCard(deck.remove(0));
+										players.get(i).addCard(deck.remove(0));	
+										players.get(i).addCard(deck.remove(0));
+										players.get(i).addCard(deck.remove(0));			
+									}
+								}
+								else if (challengeChoice==2){
+									players.get(i).addCard(deck.remove(0));
+									players.get(i).addCard(deck.remove(0));	
+									players.get(i).addCard(deck.remove(0));
+									players.get(i).addCard(deck.remove(0));	
+								}
+								Collections.sort(players.get(i).getHandcard());
+								System.out.println(players.get(i).toString());
+								flagwilddrawfour = false;
+							}
+								i++;   // player turn counter
+						} 
+						//reverse game direction
+						else if (flagrev == true) {
+							//skip function
+							if(flagskip==true){
+								i--;
+								flagskip = false;
+							}
+							//draw two function
+							if(flagdrawtwo == true){
+								i--;
+								if(i < 0)
+									i = i + playernum;
+								players.get(i).addCard(deck.remove(0));
+								players.get(i).addCard(deck.remove(0));
+								System.out.println(players.get(i).toString());
+								flagdrawtwo = false;
+							}
+							//draw four function
+							if(flagwilddrawfour == true){
+								i--;
+								if(i < 0)
+									i = i + playernum;
+								
+								System.out.println("1)Challenge or 2)no:");
+								challengeChoice = sc.nextInt();
+								rubbish = sc.nextLine();
+								
+								if(challengeChoice==1){
+									i++;
+									if(i >= playernum)
+										i = i - playernum;
+									if(players.get(i).challengeCheck(pile.get(pile.size()-2))){
+										players.get(i).addCard(deck.remove(0));
+										players.get(i).addCard(deck.remove(0));
+										players.get(i).addCard(deck.remove(0));
+										players.get(i).addCard(deck.remove(0));	
+									}
+									
+									else {
+										i--;
+										if(i < 0)
+											i = i + playernum;
+										players.get(i).addCard(deck.remove(0));
+										players.get(i).addCard(deck.remove(0));
+										players.get(i).addCard(deck.remove(0));
+										players.get(i).addCard(deck.remove(0));	
+										players.get(i).addCard(deck.remove(0));
+										players.get(i).addCard(deck.remove(0));			
+									}
+								}
+								else if (challengeChoice==2){
+									players.get(i).addCard(deck.remove(0));
+									players.get(i).addCard(deck.remove(0));	
+									players.get(i).addCard(deck.remove(0));
+									players.get(i).addCard(deck.remove(0));	
+								}
+								Collections.sort(players.get(i).getHandcard());
+								System.out.println(players.get(i).toString());
+								flagwilddrawfour = false;
+							}
+								i--;
+						}
+						
+					
+					}
+					// ---------------CHoose card from deck--------------------
+				}
+			}
+			//---------------------------player draws a card---------------------
+			else if (choice == 2){
+				players.get(i).addCard(deck.remove(0));
+				System.out.println("Player"+(i+1)+"'s content"+players.get(i).toString());
+				//System.out.println("deck before is empty" +deck.toString()); //display 
+				if(deck.isEmpty()){
+					while(pile.size()>1){
+						deck.add(pile.remove(0));
+					}
+					Collections.shuffle(deck);
+					//System.out.println("deck after pile filling" +deck.toString());
+					
+				}
+			//---------------------------player draws a card---------------------
+			}
+			choice=0;
+		}
+		System.out.println("Player" + i + " won!");
+
+		
+
+		// reverse and game loop part
 		// boolean flagrev = false;
 		// int i = 0;
 		// while (/* END GAME */i < 10) {
@@ -145,13 +344,6 @@ public class Game {
 		// i++;
 		// }
 
-		// Collections.shuffle(deck);
-		// System.out.println(deck.toString());
 	}
-	/*
-	 * deck.add(new Card ("red","6")); deck.add(new Card ("red","7"));
-	 * System.out.println(deck.get(0).getColor() + deck.get(0).getSymbol() +
-	 * " "); System.out.println(deck.get(1).getColor() + deck.get(1).getSymbol()
-	 * + " " +"\n size:" +deck.size());
-	 */
+
 }

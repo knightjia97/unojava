@@ -7,7 +7,8 @@ public class Skip extends Card{
 		//testhehe
 	}
 	
-	public void SkipPlayer(){
+	public void action(){
+			Game.flagskip = true;
 	}
 
 }

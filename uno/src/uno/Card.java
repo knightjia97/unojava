@@ -43,7 +43,6 @@ public class Card implements Comparable<Card> {
 	public int compareTo(Card o) {
 		return this.getId() - o.getId();
 	}
-	
 
 	public boolean isValidCard(Card o) {
 		if (this.getColor().equals(o.getColor()) || this.getSymbol().equals(o.getSymbol())
