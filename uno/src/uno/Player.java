@@ -29,7 +29,7 @@ public class Player {
 	}
 
 	public String getName() {
-		return name + "\n";
+		return name;
 	}
 	
 	public int getCount(){
@@ -37,7 +37,7 @@ public class Player {
 	}
 
 	public String toString() {
-		return "Name: '" + this.name + "', cards: '" + this.getHandcard() + "\n";
+		return "Name: '" + this.name + "', cards: '" + this.getHandcard() + "'\n";
 	}
 
 	// testing
@@ -65,6 +65,11 @@ public class Player {
 		if (i >= 0 && i <= handcard.size()) { //check valid choice
 			if (handcard.get(i- 1).isValidCard(o)) //match color or symbol
 				return true;
+			else if(handcard.get(i-1).getSymbol().equals("CopyCat")){
+				if(o.getSymbol().equals("Wild") || o.getSymbol().equals("WildDrawFour"))
+					return false;
+				else return true;
+			}
 			else {
 				System.out.println("Choose a valid card that matches the color or symbol");
 				return false;

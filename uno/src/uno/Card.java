@@ -36,7 +36,7 @@ public class Card implements Comparable<Card> {
 	}
 
 	public String toString() {
-		return "Color: '" + this.color + "', Symbol: '" + this.symbol + ", ID: " + this.id + "\n";
+		return "Color: '" + this.color + "', Symbol: '" + this.symbol + "'\n";
 	}
 
 	@Override
@@ -44,6 +44,7 @@ public class Card implements Comparable<Card> {
 		return this.getId() - o.getId();
 	}
 
+	
 	public boolean isValidCard(Card o) {
 		if (this.getColor().equals(o.getColor()) || this.getSymbol().equals(o.getSymbol())
 				|| this.getSymbol().equals("Wild") || this.getSymbol().equals("WildDrawFour")) {
