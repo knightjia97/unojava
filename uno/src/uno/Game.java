@@ -1,5 +1,11 @@
 package uno;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Collections;
@@ -7,29 +13,53 @@ import java.util.Scanner;
 
 public class Game {
 
-	public static int turncount = 0;// global turn counter
 	public static boolean flagrev = false;
 	public static boolean flagskip = false;
 	public static boolean flagdrawtwo = false;
-	public static boolean flagalldrawtwo = false;
 	public static boolean flagwilddrawfour = false;
 
 	public static void main(String[] args) {
-
+		//----------------------------ascii art drawing-----------------------------------------------
+		int width=220;
+		int height=25;
+		
+		BufferedImage image = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
+		Graphics g = image.getGraphics();
+		g.setFont(new Font("SansSerif",Font.PLAIN,14));
+		
+		Graphics2D g2 = (Graphics2D)g;
+		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		g2.drawString("WELCOME TO JAVA UNO GAME!", 3, 18);
+		//----------------------------ascii art drawing-----------------------------------------------
+		
+		
 		Scanner sc = new Scanner(System.in);
-		int id = 1;
-		int playcard;
-		int playernum = 0;
+		int id = 1;                               //to declare id for each card
+		int playcard;                             //card choice to play
+		int playernum = 0;                        //number of players
 		int challengeChoice = 0;
 		String rubbish;
 		boolean validPlayernum = false;
+		boolean validPlayeraction = false;        //to validate the action for each player
 
-		System.out.println("Welcome to JAVA UNO GAME!!!");
-
-		// check valid player number
+		//----------------------------ascii art drawing-----------------------------------------------	
+		for(int y=0;y<height;y++)
+		{
+			StringBuilder builder = new StringBuilder();
+			
+			for(int x = 0; x<width;x++){
+				builder.append(image.getRGB(x, y)==-16777216 ? "@" : " ");
+			}
+			System.out.println(builder);
+		}
+		//----------------------------ascii art drawing-----------------------------------------------
+		
+		System.out.println("\n");
+		
+		// check valid player numbers
 		while (validPlayernum == false) {
 			System.out.println("Enter the number of players(Recommended 2-4 players): ");
-			while (!sc.hasNextInt()) {
+			while (!sc.hasNextInt()) { //check for invalid input (not integers)
 				System.out.println("That's not a number!");
 				sc.nextLine();
 			}
@@ -39,17 +69,18 @@ public class Game {
 				validPlayernum = true;
 		}
 
-		// prompt players' name
+		// prompt players' names
 		ArrayList<Player> players = new ArrayList<Player>();
 		for (int i = 0; i < playernum; i++) {
 			System.out.println("Enter player" + (i + 1) + " name: ");
 			players.add(new Player(sc.nextLine()));
 		}
 
+		//intializing card deck, pile deck, and player array
 		ArrayList<Card> deck = new ArrayList<Card>();
 		ArrayList<Card> pile = new ArrayList<Card>(); // empty pile
 		String[] symbol = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
-		String[] color = { "red", "yellow", "green", "blue" };
+		String[] color = { "Red", "Yellow", "Green", "Blue" };
 
 		// initializing card deck with id
 		for (int i = 0; i <= 3; i++) {
@@ -79,38 +110,36 @@ public class Game {
 			id++;
 			deck.add(new DrawTwo(color[i], "DrawTwo", id));
 			id++;
-//			deck.add(new AllDrawTwo(color[i], "AllDrawTwo", id));
-//			id++;
 
 		}
 
-		deck.add(new Wild("", "Wild", id));
+		deck.add(new Wild("No Color", "Wild", id));
 		id++;
-		deck.add(new Wild("", "Wild", id));
+		deck.add(new Wild("No Color", "Wild", id));
 		id++;
-		deck.add(new WildDrawFour("", "WildDrawFour", id));
+		deck.add(new WildDrawFour("No Color", "WildDrawFour", id));
 		id++;
-		deck.add(new WildDrawFour("", "WildDrawFour", id));
+		deck.add(new WildDrawFour("No Color", "WildDrawFour", id));
 		id++;
-		deck.add(new CopyCat("", "CopyCat", id));//self implemented action cards
+		deck.add(new CopyCat("No Color", "CopyCat", id));//self implemented action cards, copies last played card
 		id++;
-		deck.add(new CopyCat("", "CopyCat", id));
+		deck.add(new CopyCat("No Color", "CopyCat", id));//can only be played on normal cards to copy their property("color" and "symbol")
+		id++;									//wild,wild draw four,reverse,skip are special cards(not normal cards)
+		deck.add(new CopyCat("No Color", "CopyCat", id));
 		id++;
-		deck.add(new CopyCat("", "CopyCat", id));
-		id++;
-		deck.add(new CopyCat("", "CopyCat", id));
-
-		//Collections.shuffle(deck);
+		deck.add(new CopyCat("No Color", "CopyCat", id));
+		
+		Collections.shuffle(deck);
 
 		pile.add(deck.remove(0));
 		
 		// distribute cards to players
 		for (int i = 0; i < playernum; i++) {
 			players.get(i).addCard(deck.remove(0));
-//			players.get(i).addCard(deck.remove(0));
-//			players.get(i).addCard(deck.remove(0));
-//			players.get(i).addCard(deck.remove(0));
-//			players.get(i).addCard(deck.remove(0));
+			players.get(i).addCard(deck.remove(0));
+			players.get(i).addCard(deck.remove(0));
+			players.get(i).addCard(deck.remove(0));
+			players.get(i).addCard(deck.remove(0));
 		}
 
 		// ------------------AFTER GAME INITIALIZATION------------------------
@@ -144,26 +173,17 @@ public class Game {
 			case "Wild":
 				System.out.println("Replacing Wild Card on top");
 				pile.add(deck.remove(0));
-				System.out.println("\n\nTOP CARD IN PILE:" + pile.get(pile.size() - 1).toString());
-				if(!(pile.get(pile.size() - 1).getSymbol().equals("Wild")||pile.get(pile.size()-1).getSymbol().equals("WildDrawFour")||
-						pile.get(pile.size()-1).getSymbol().equals("CopyCat")))
-					firstpilecardflag = false;
+				System.out.println("\n\nTOP CARD IN PILE : " + pile.get(pile.size() - 1).toString());
 				break;
 			case "WildDrawFour":
 				System.out.println("Replacing Wild Draw Four Card on top");
 				pile.add(deck.remove(0));
-				System.out.println("\n\nTOP CARD IN PILE:" + pile.get(pile.size() - 1).toString());
-				if(!(pile.get(pile.size() - 1).getSymbol().equals("Wild")||pile.get(pile.size()-1).getSymbol().equals("WildDrawFour")||
-						pile.get(pile.size()-1).getSymbol().equals("CopyCat")))
-					firstpilecardflag = false;
+				System.out.println("\n\nTOP CARD IN PILE : " + pile.get(pile.size() - 1).toString());
 				break;
 			case "CopyCat":
 				System.out.println("Replacing Copy Cat Card on top");
 				pile.add(deck.remove(0));
-				System.out.println("\n\nTOP CARD IN PILE:" + pile.get(pile.size() - 1).toString());
-				if(!(pile.get(pile.size() - 1).getSymbol().equals("Wild")||pile.get(pile.size()-1).getSymbol().equals("WildDrawFour")||
-						pile.get(pile.size()-1).getSymbol().equals("CopyCat")))
-					firstpilecardflag = false;
+				System.out.println("\n\nTOP CARD IN PILE : " + pile.get(pile.size() - 1).toString());
 				break;
 				
 			default:
@@ -217,25 +237,47 @@ public class Game {
 			if (i < 0)
 				i = i + playernum;
 
-			System.out.println("\n\nTOP CARD IN PILE:" + pile.get(pile.size() - 1).toString());
+			System.out.println("\n\nTOP CARD IN PILE : " + pile.get(pile.size() - 1).toString());
 			System.out.println(players.get(i).getName() + "'s turn: ");
 			Collections.sort(players.get(i).getHandcard());
 			System.out.println("Your hand card:\n" + players.get(i).toString()); // display
 																					// player
 																					// card
-			while (choice != 1 && choice != 2) {
+			
+			while (validPlayeraction == false) {
 				System.out.println("Choose your action: 1)Play a card ");
 				System.out.println("                    2)Draw a card ");
+				while (!sc.hasNextInt()) { //check for invalid inputs(not integers)
+					System.out.println("That's not a number!");
+					sc.nextLine();
+					System.out.println("Choose your action: 1)Play a card ");
+					System.out.println("                    2)Draw a card ");
+				}
 				choice = sc.nextInt();
 				rubbish = sc.nextLine();
+				
+				if(choice==1){
+				if(players.get(i).handCheck(pile.get(pile.size()-1))) //checking player's hand to check for any valid cards matching top pile
+					validPlayeraction = true ;
+				else{
+						System.out.println("Unplayable handcards, you must draw a card");
+					}
+				}
+				else
+					validPlayeraction = true;
 			}
 
 			if (choice == 1) {
+				
 				// ---------------Choose card from deck--------------------
-				while (validcardFlag == false) { // check valid card , if true,
-													// proceed || if false, loop
+				while (validcardFlag == false) { // check valid card , if true,proceed || if false, loop
 													// until valid
-					System.out.println("Enter your card to draw");
+					System.out.println("Enter your card to play");
+					while (!sc.hasNextInt()) { //check for invalid input (not integers)
+						System.out.println("That's not a number!");
+						sc.nextLine();
+						System.out.println("Enter your card to play");
+					}
 					playcard = sc.nextInt();
 					rubbish = sc.nextLine();
 
@@ -294,7 +336,7 @@ public class Game {
 								i++;
 								if (i >= playernum)
 									i = i - playernum;
-
+								System.out.println(players.get(i).getName()+"'s turn");
 								System.out.println("1)Challenge or 2)no:");
 								challengeChoice = sc.nextInt();
 								rubbish = sc.nextLine();
@@ -303,7 +345,7 @@ public class Game {
 									i--;
 									if (i < 0)
 										i = i + playernum;
-									if (players.get(i).challengeCheck(pile.get(pile.size() - 2))) {
+									if (players.get(i).challengeCheck(pile.get(pile.size() - 2))) {//challenge checking
 										players.get(i).addCard(deck.remove(0));
 										players.get(i).addCard(deck.remove(0));
 										players.get(i).addCard(deck.remove(0));
@@ -364,7 +406,7 @@ public class Game {
 									i++;
 									if (i >= playernum)
 										i = i - playernum;
-									if (players.get(i).challengeCheck(pile.get(pile.size() - 2))) {
+									if (players.get(i).challengeCheck(pile.get(pile.size() - 2))) { //challenge checking
 										players.get(i).addCard(deck.remove(0));
 										players.get(i).addCard(deck.remove(0));
 										players.get(i).addCard(deck.remove(0));
@@ -399,29 +441,52 @@ public class Game {
 					// ---------------CHoose card from deck--------------------
 				}
 			}
-			// ---------------------------player draws a
-			// card---------------------
+			
+			// ---------------------------player draws a card---------------------
 			else if (choice == 2) {
-				players.get(i).addCard(deck.remove(0));
-				System.out.println("Player" + (i + 1) + "'s content" + players.get(i).toString());
-				// System.out.println("deck before is empty" +deck.toString());
-				// //display
-				if (deck.isEmpty()) {
+
+				if (deck.isEmpty()) { //check if deck is empty , refill from pile
+					System.out.println("The deck is empty, refilling deck with cards from pile");
 					while (pile.size() > 1) {
+						if(pile.get(0).getId()>=57 && pile.get(0).getId()<=60){
+							pile.get(0).setColor("");
+							pile.get(0).setSymbol("CopyCat");
+						}
 						deck.add(pile.remove(0));
+						
 					}
 					Collections.shuffle(deck);
-					// System.out.println("deck after pile filling"
-					// +deck.toString());
-
 				}
-				// ---------------------------player draws a
-				// card---------------------
+				players.get(i).addCard(deck.remove(0));
+			// ---------------------------player draws a card---------------------
 			}
 			choice = 0;
+			validPlayeraction = false;
+			
 		}
-		System.out.println("Player" + i + " won!");
-
+		width=180;
+		height=25;
+		BufferedImage im = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
+		Graphics p = im.getGraphics();
+		p.setFont(new Font("SansSerif",Font.BOLD,24));
+		
+		Graphics2D p2 = (Graphics2D)p;
+		p2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		p2.drawString("UNO GAME!", 25, 21);
+		//----------------------------ascii art drawing-----------------------------------------------
+		for(int y=0;y<height;y++)
+		{
+			StringBuilder builder = new StringBuilder();
+			
+			for(int x = 0; x<width;x++){
+				builder.append(im.getRGB(x, y)==-16777216 ? "@" : " ");
+			}
+			System.out.println(builder);
+		}
+		//----------------------------ascii art drawing-----------------------------------------------
+		System.out.println("\n\n");
+		System.out.println("\n\n"+players.get(i).getName() + " won!");
+		
 	}
 
 }

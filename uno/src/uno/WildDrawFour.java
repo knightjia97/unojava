@@ -23,16 +23,16 @@ public class WildDrawFour extends Card{
 			
 			switch(colorChoice){
 			case 1:
-				this.setColor("red");
+				this.setColor("Red");
 				break;
 			case 2:
-				this.setColor("yellow");
+				this.setColor("Yellow");
 				break;
 			case 3:
-				this.setColor("green");
+				this.setColor("Green");
 				break;
 			case 4:
-				this.setColor("blue");
+				this.setColor("Blue");
 				break;
 			}
 		Game.flagwilddrawfour = true;

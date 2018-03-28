@@ -23,6 +23,10 @@ public class Card implements Comparable<Card> {
 		return id;
 	}
 
+	public void setId(int id) {
+		this.id = id;
+	}
+
 	public void setColor(String c) {
 		this.color = c;
 
@@ -36,7 +40,7 @@ public class Card implements Comparable<Card> {
 	}
 
 	public String toString() {
-		return "Color: '" + this.color + "', Symbol: '" + this.symbol + "'\n";
+		return "[" + this.color + "] {" + this.symbol + "}\n";
 	}
 
 	@Override
@@ -44,7 +48,6 @@ public class Card implements Comparable<Card> {
 		return this.getId() - o.getId();
 	}
 
-	
 	public boolean isValidCard(Card o) {
 		if (this.getColor().equals(o.getColor()) || this.getSymbol().equals(o.getSymbol())
 				|| this.getSymbol().equals("Wild") || this.getSymbol().equals("WildDrawFour")) {
